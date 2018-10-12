@@ -1,5 +1,5 @@
 
-> ##微信、QQ网页端第三方登录
+> ## 微信、QQ网页端第三方登录
 
 ```
 还在调试中哦
@@ -39,7 +39,7 @@ $config = [
 ];
 
 $wxWeb = new \app\common\oauth\WxWeb($config);
-//调用wxLogin方法会自动跳转到QQ授权登录页面
+//调用wxLogin方法会自动跳转到微信授权登录页面
 $wxWeb->wxLogin();
 ```
 

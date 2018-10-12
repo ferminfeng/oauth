@@ -139,7 +139,7 @@ class WxWeb
     {
         $login_url = $this->_get_auth_url . '?appid=' . $this->_wx_appid . '&redirect_uri=' . urlencode($this->_redirect_uri) . '&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect';
 
-        header("Location:" . $login_url);
+        return $login_url;
     }
 
     /**

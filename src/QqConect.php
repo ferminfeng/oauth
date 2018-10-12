@@ -437,8 +437,7 @@ class QqConect
             "scope"         => 'get_user_info',
         ];
         $login_url = $this->combineURL(self::GET_AUTH_CODE_URL, $keysArr);
-
-        header("Location:$login_url");
+        return $login_url;
     }
 
     public function qqCallback()
