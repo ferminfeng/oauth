@@ -83,7 +83,7 @@ $wxWeb = new \app\common\oauth\WxWeb($config, $code, 'h5');
 
 /*
 * 存储 token_info 数据
-* 在 access_token 有效期内(expires_in)可直接使用存储的callback数据
+* 在 access_token 有效期内(expires_in)可直接使用存储的 token_info 数据
 * 在 access_token 失效前可通过 $wxWeb->refreshAccessToken() 方法刷新 access_token
 */
 $token_info = $wxWeb->InitToken();

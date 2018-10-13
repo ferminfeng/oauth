@@ -48,7 +48,7 @@ class OauthController extends Controller
     {
         $code = empty($_GET['code']) ? '' : $_GET['code'];
         if (empty($code)) {
-            exit('code为空');
+            echo 'code为空';die;
         }
 
         $config = [
@@ -68,7 +68,7 @@ class OauthController extends Controller
 
         //获取token和openid
         if (!isset($token_info['access_token']) || empty($token_info['access_token']) || !isset($token_info['openid']) || empty($token_info['openid'])) {
-            exit('access_token|openid为空');
+            echo 'access_token|openid为空';die;
         }
         $access_token = $token_info['access_token'];
         $open_id = $token_info['openid'];
@@ -76,7 +76,7 @@ class OauthController extends Controller
         //获取用户信息
         $user_info = $wxWeb->getUserInfo($access_token, $open_id);
         if (!$user_info || !is_array($user_info)) {
-            exit('用户信息为空');
+            echo '用户信息为空';die;
         }
 
         print_r($user_info);
@@ -108,7 +108,7 @@ class OauthController extends Controller
         $user_info = $qcConect->getUserInfo($access_token, $openid);
 
         if (!$user_info || !is_array($user_info)) {
-            exit('用户信息为空');
+            echo '用户信息为空';die;
         }
 
         print_r($user_info);
