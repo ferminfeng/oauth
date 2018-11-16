@@ -33,9 +33,8 @@ class WxWeb
             $this->_wx_secret = $config['app_secret'];
             $this->_redirect_uri = isset($config['callback']) ? $config['callback'] : '';
         } else {
-            $this->_wx_appid = $config['appid'];
-            $this->_wx_secret = $config['secret'];
-            $this->_redirect_uri = isset($config['callback']) ? $config['callback'] : '';
+            $this->_wx_appid = $config['app_id'];
+            $this->_wx_secret = $config['app_secret'];
         }
     }
 
