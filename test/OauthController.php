@@ -64,14 +64,15 @@ class OauthController extends Controller
          * 在 access_token 有效期内(expires_in)可直接使用存储的 token_info 数据
          * 在 access_token 失效前可通过 $wxWeb->refreshAccessToken() 方法刷新 access_token
          */
-        $token_info = $wxWeb->InitToken();
-
+        $wxWeb->InitToken();
+		
         //获取token和openid
-        if (!isset($token_info['access_token']) || empty($token_info['access_token']) || !isset($token_info['openid']) || empty($token_info['openid'])) {
+        $access_token = $wx_class->getAccessToken();
+        $open_id = $wx_class->getOpenId();
+
+        if (!$access_token || !i$open_id) {
             echo 'access_token|openid为空';die;
         }
-        $access_token = $token_info['access_token'];
-        $open_id = $token_info['openid'];
 
         //获取用户信息
         $user_info = $wxWeb->getUserInfo($access_token, $open_id);

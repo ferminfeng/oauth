@@ -44,7 +44,11 @@ class WxWeb
      * access_token 有效期两小时
      * refresh_token 有效期30天
      *
-     * @return bool|mixed
+     * 请求成功
+     * {"access_token":"ACCESS_TOKEN","expires_in":7200,"refresh_token":"REFRESH_TOKEN","openid":"OPENID","scope":"SCOPE"}
+     * 请求失败
+     * {"errcode":40029,"errmsg":"invalid code"}
+     *
      */
     public function InitToken()
     {
@@ -54,24 +58,11 @@ class WxWeb
         //解析json
         $token_info = json_decode($res, true);
 
-        /*
-         * 请求成功
-         * {"access_token":"ACCESS_TOKEN","expires_in":7200,"refresh_token":"REFRESH_TOKEN","openid":"OPENID","scope":"SCOPE"}
-         * 请求失败
-         * {"errcode":40029,"errmsg":"invalid code"}
-         */
-        if (!isset($token_info["access_token"]) || !isset($token_info["expires_in"]) || !isset($token_info["openid"])) {
-            return false;
+        if ($token_info && isset($token_info['access_token']) && isset($token_info['expires_in']) && isset($token_info['openid'])) {
+            $this->setAccessToken( $token_info['access_token']);   // 设置token
+            $this->setExpiresIn($token_info['expires_in']); // 设置 expires_in
+            $this->setOpenId($token_info['openid']); // 设置openid
         }
-
-        $access_token = $token_info["access_token"];
-        $expires_in = $token_info["expires_in"];
-        $openid = $token_info["openid"];
-
-        $this->setAccessToken($access_token);   // 设置token
-        $this->setExpiresIn($expires_in); // 设置 expires_in
-        $this->setOpenId($openid); // 设置openid
-        return $token_info;
     }
 
     /**
@@ -93,7 +84,10 @@ class WxWeb
     /**
      * 小程序微信登录获取session_key+openid
      *
-     * @return mixed
+     * 正常返回的JSON数据包
+     * {"openid": "OPENID","session_key": "SESSIONKEY"}
+     * 错误时返回JSON数据包(示例为Code无效)
+     * {"errcode": 40029,"errmsg": "invalid code"}
      */
     public function InitSessionKey()
     {
@@ -103,12 +97,6 @@ class WxWeb
         //解析json
         $token_info = json_decode($res, true);
 
-        /**
-         * 正常返回的JSON数据包
-         * {"openid": "OPENID","session_key": "SESSIONKEY"}
-         * 错误时返回JSON数据包(示例为Code无效)
-         * {"errcode": 40029,"errmsg": "invalid code"}
-         */
         if ($token_info && isset($token_info['openid']) && isset($token_info['session_key'])) {
             $this->setSessionKey($token_info['session_key']);   //设置session_key
             $this->setOpenId($token_info['openid']); //设置openid
@@ -116,7 +104,6 @@ class WxWeb
                 $this->setUnionId($token_info['unionId']); //设置unionId
             }
         }
-        return $token_info;
     }
 
     /**
