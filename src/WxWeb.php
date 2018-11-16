@@ -43,6 +43,8 @@ class WxWeb
      * H5获取access_token
      * access_token 有效期两小时
      * refresh_token 有效期30天
+     *
+     * @return bool|mixed
      */
     public function InitToken()
     {
@@ -58,6 +60,17 @@ class WxWeb
          * 请求失败
          * {"errcode":40029,"errmsg":"invalid code"}
          */
+        if (!isset($token_info["access_token"]) || !isset($token_info["expires_in"]) || !isset($token_info["openid"])) {
+            return false;
+        }
+
+        $access_token = $token_info["access_token"];
+        $expires_in = $token_info["expires_in"];
+        $openid = $token_info["openid"];
+
+        $this->setAccessToken($access_token);   // 设置token
+        $this->setExpiresIn($expires_in); // 设置 expires_in
+        $this->setOpenId($openid); // 设置openid
         return $token_info;
     }
 
@@ -79,10 +92,11 @@ class WxWeb
 
     /**
      * 小程序微信登录获取session_key+openid
+     *
+     * @return mixed
      */
     public function InitSessionKey()
     {
-
         $token_url = $this->_get_session_key . '&appid=' . $this->_wx_appid . '&secret=' . $this->_wx_secret . '&js_code=' . $this->_code;
         $res = $this->getUrlRes($token_url);
 
@@ -98,10 +112,12 @@ class WxWeb
         if ($token_info && isset($token_info['openid']) && isset($token_info['session_key'])) {
             $this->setSessionKey($token_info['session_key']);   //设置session_key
             $this->setOpenId($token_info['openid']); //设置openid
+            if(isset($token_info['unionId'])){
+                $this->setUnionId($token_info['unionId']); //设置unionId
+            }
         }
         return $token_info;
     }
-
 
     /**
      * 通过url获取内容
@@ -134,6 +150,8 @@ class WxWeb
 
     /**
      * 微信登录
+     *
+     * @return string
      */
     public function wxLogin()
     {
@@ -177,6 +195,11 @@ class WxWeb
         $this->_openid = $openid;
     }
 
+    /**
+     * 获取openid
+     *
+     * @return bool
+     */
     public function getOpenId()
     {
         if (empty($this->_openid)) {
@@ -187,7 +210,7 @@ class WxWeb
     }
 
     /**
-     * access_token
+     * 设置 access_token
      *
      * @param $access_token
      */
@@ -196,12 +219,41 @@ class WxWeb
         $this->_access_token = $access_token;
     }
 
+    /**
+     * 获取 access_token
+     *
+     * @return bool
+     */
     public function getAccessToken()
     {
         if (empty($this->_access_token)) {
             return false;
         } else {
             return $this->_access_token;
+        }
+    }
+
+    /**
+     * 设置 expires_in
+     *
+     * @param $expires_in
+     */
+    private function setExpiresIn($expires_in)
+    {
+        $this->_expires_in = $expires_in;
+    }
+
+    /**
+     * 获取 expires_in
+     *
+     * @return bool|string
+     */
+    public function getExpiresIn()
+    {
+        if (empty($this->_expires_in)) {
+            return false;
+        } else {
+            return $this->_expires_in;
         }
     }
 
@@ -215,6 +267,10 @@ class WxWeb
         $this->_refresh_token = $refresh_token;
     }
 
+    /**
+     * 获取 token
+     * @return bool|string
+     */
     public function getRefreshToken()
     {
         if (empty($this->_refresh_token)) {
@@ -234,6 +290,11 @@ class WxWeb
         $this->_session_key = $session_key;
     }
 
+    /**
+     * 获取session_key
+     *
+     * @return bool|string
+     */
     public function getSessionKey()
     {
         if (empty($this->_session_key)) {
@@ -244,7 +305,37 @@ class WxWeb
     }
 
     /**
+     * 设置 unionId
+     *
+     * @param $unionId
+     */
+    private function setUnionId($unionId)
+    {
+        $this->_unionid = $unionId;
+    }
+
+    /**
+     * 设置 unionId
+     *
+     * @return bool|string
+     */
+    public function getUnionId()
+    {
+        if (empty($this->_unionid)) {
+            return false;
+        } else {
+            return $this->_unionid;
+        }
+    }
+
+    /**
      * 对微信小程序用户加密数据的解密
+     *
+     * @param $sessionKey
+     * @param $encryptedData
+     * @param $iv
+     *
+     * @return bool|mixed
      */
     public function wxBizDataCrypt($sessionKey, $encryptedData, $iv)
     {
@@ -268,7 +359,7 @@ class WxWeb
      *
      * @return mixed
      */
-    public function getwxacode($scene)
+    public function getWxaCode($scene)
     {
         $token_url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential' . '&appid=' . $this->_wx_appid . '&secret=' . $this->_wx_secret;
         $res = $this->getUrlRes($token_url);
@@ -287,13 +378,19 @@ class WxWeb
 
         $post_str = json_encode($data);
 
-        $post_datas = self::curlpost($get_url, $post_str);
+        $post_datas = self::curlPost($get_url, $post_str);
 
         return $post_datas;
 
     }
 
-    public function curlpost($url, $data_string)
+    /**
+     * @param $url
+     * @param $data_string
+     *
+     * @return mixed
+     */
+    public function curlPost($url, $data_string)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
